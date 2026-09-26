@@ -1,23 +1,33 @@
 package ru.yandex.practicum.filmorate.controller;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import ru.yandex.practicum.filmorate.exception.ValidationException;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
+import org.springframework.http.MediaType;
+import org.springframework.test.web.servlet.MockMvc;
+import org.springframework.test.web.servlet.ResultActions;
 import ru.yandex.practicum.filmorate.model.Film;
 
 import java.time.LocalDate;
 
-import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
-import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
+@WebMvcTest(FilmController.class)
 class FilmControllerTest {
-    private FilmController controller;
+
+    @Autowired
+    private MockMvc mockMvc;
+
+    @Autowired
+    private ObjectMapper objectMapper;
+
     private Film film;
 
     @BeforeEach
     void setUp() {
-        controller = new FilmController();
-
         film = new Film(
                 null,
                 "Интерстеллар",
@@ -28,71 +38,73 @@ class FilmControllerTest {
     }
 
     @Test
-    void shouldAcceptValidFilm() {
-        assertDoesNotThrow(() -> controller.create(film));
+    void shouldAcceptValidFilm() throws Exception {
+        createFilm(film)
+                .andExpect(status().isOk());
     }
 
     @Test
-    void shouldRejectBlankName() {
+    void shouldRejectBlankName() throws Exception {
         film.setName(" ");
 
-        assertThrows(
-                ValidationException.class,
-                () -> controller.create(film)
-        );
+        createFilm(film)
+                .andExpect(status().isBadRequest());
     }
 
     @Test
-    void shouldRejectDescriptionLongerThan200Characters() {
+    void shouldRejectDescriptionLongerThan200Characters()
+            throws Exception {
         film.setDescription("a".repeat(201));
 
-        assertThrows(
-                ValidationException.class,
-                () -> controller.create(film)
-        );
+        createFilm(film)
+                .andExpect(status().isBadRequest());
     }
 
     @Test
-    void shouldAcceptDescriptionWith200Characters() {
+    void shouldAcceptDescriptionWith200Characters()
+            throws Exception {
         film.setDescription("a".repeat(200));
 
-        assertDoesNotThrow(() -> controller.create(film));
+        createFilm(film)
+                .andExpect(status().isOk());
     }
 
     @Test
-    void shouldRejectReleaseDateBeforeFirstFilm() {
+    void shouldRejectReleaseDateBeforeFirstFilm()
+            throws Exception {
         film.setReleaseDate(LocalDate.of(1895, 12, 27));
 
-        assertThrows(
-                ValidationException.class,
-                () -> controller.create(film)
-        );
+        createFilm(film)
+                .andExpect(status().isBadRequest());
     }
 
     @Test
-    void shouldAcceptFirstFilmDate() {
+    void shouldAcceptFirstFilmDate() throws Exception {
         film.setReleaseDate(LocalDate.of(1895, 12, 28));
 
-        assertDoesNotThrow(() -> controller.create(film));
+        createFilm(film)
+                .andExpect(status().isOk());
     }
 
     @Test
-    void shouldRejectZeroDuration() {
+    void shouldRejectZeroDuration() throws Exception {
         film.setDuration(0);
 
-        assertThrows(
-                ValidationException.class,
-                () -> controller.create(film)
-        );
+        createFilm(film)
+                .andExpect(status().isBadRequest());
     }
 
     @Test
-    void shouldRejectNegativeDuration() {
+    void shouldRejectNegativeDuration() throws Exception {
         film.setDuration(-1);
 
-        assertThrows(
-                ValidationException.class,
-                () -> controller.create(film)
-        );
+        createFilm(film)
+                .andExpect(status().isBadRequest());
+    }
+
+    private ResultActions createFilm(Film film) throws Exception {
+        return mockMvc.perform(post("/films")
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(objectMapper.writeValueAsString(film)));
     }
 }
