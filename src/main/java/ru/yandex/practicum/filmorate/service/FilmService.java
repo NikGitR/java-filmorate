@@ -1,6 +1,6 @@
 package ru.yandex.practicum.filmorate.service;
 
-import org.springframework.beans.factory.annotation.Autowired;
+import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import ru.yandex.practicum.filmorate.exception.ValidationException;
 import ru.yandex.practicum.filmorate.model.Film;
@@ -11,36 +11,30 @@ import java.util.Comparator;
 import java.util.List;
 
 @Service
+@RequiredArgsConstructor
 public class FilmService {
 
     private final FilmStorage filmStorage;
     private final UserStorage userStorage;
 
-    @Autowired
-    public FilmService(FilmStorage filmStorage,
-                       UserStorage userStorage) {
-        this.filmStorage = filmStorage;
-        this.userStorage = userStorage;
-    }
-
-    public void addLike(long filmId, long userId) {
+    public void addLike(Long filmId, Long userId) {
         Film film = filmStorage.getById(filmId);
         userStorage.getById(userId);
 
         film.getLikes().add(userId);
     }
 
-    public void deleteLike(long filmId, long userId) {
+    public void deleteLike(Long filmId, Long userId) {
         Film film = filmStorage.getById(filmId);
         userStorage.getById(userId);
 
         film.getLikes().remove(userId);
     }
 
-    public List<Film> getPopularFilms(int count) {
-        if (count < 0) {
+    public List<Film> getPopularFilms(Integer count) {
+        if (count == null || count < 0) {
             throw new ValidationException(
-                    "Количество фильмов не может быть отрицательным"
+                    "Количество фильмов должно быть указано и не может быть отрицательным"
             );
         }
 

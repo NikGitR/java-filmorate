@@ -1,23 +1,27 @@
 package ru.yandex.practicum.filmorate.service;
 
-import org.springframework.beans.factory.annotation.Autowired;
+import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import ru.yandex.practicum.filmorate.exception.ValidationException;
 import ru.yandex.practicum.filmorate.model.User;
 import ru.yandex.practicum.filmorate.storage.user.UserStorage;
 
 import java.util.List;
+import java.util.Objects;
 
 @Service
+@RequiredArgsConstructor
 public class UserService {
 
     private final UserStorage userStorage;
 
-    @Autowired
-    public UserService(UserStorage userStorage) {
-        this.userStorage = userStorage;
-    }
+    public void addFriend(Long userId, Long friendId) {
+        if (Objects.equals(userId, friendId)) {
+            throw new ValidationException(
+                    "Пользователь не может добавить самого себя в друзья"
+            );
+        }
 
-    public void addFriend(long userId, long friendId) {
         User user = userStorage.getById(userId);
         User friend = userStorage.getById(friendId);
 
@@ -25,7 +29,7 @@ public class UserService {
         friend.getFriends().add(userId);
     }
 
-    public void deleteFriend(long userId, long friendId) {
+    public void deleteFriend(Long userId, Long friendId) {
         User user = userStorage.getById(userId);
         User friend = userStorage.getById(friendId);
 
@@ -33,7 +37,7 @@ public class UserService {
         friend.getFriends().remove(userId);
     }
 
-    public List<User> getFriends(long userId) {
+    public List<User> getFriends(Long userId) {
         User user = userStorage.getById(userId);
 
         return user.getFriends().stream()
@@ -41,7 +45,7 @@ public class UserService {
                 .toList();
     }
 
-    public List<User> getCommonFriends(long userId, long otherId) {
+    public List<User> getCommonFriends(Long userId, Long otherId) {
         User user = userStorage.getById(userId);
         User otherUser = userStorage.getById(otherId);
 
