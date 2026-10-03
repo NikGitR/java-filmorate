@@ -59,6 +59,7 @@ public class FilmDbStorage implements FilmStorage {
     @Override
     @Transactional
     public Film create(Film film) {
+        validateReferences(film);
         String sql = """
                 INSERT INTO films (
                     name,
@@ -98,6 +99,7 @@ public class FilmDbStorage implements FilmStorage {
     @Override
     @Transactional
     public Film update(Film film) {
+        validateReferences(film);
         String sql = """
                 UPDATE films
                 SET name = ?,
@@ -299,5 +301,42 @@ public class FilmDbStorage implements FilmStorage {
                         filmId
                 )
         );
+    }
+
+    private void validateReferences(Film film) {
+        int mpaId = film.getMpa().getId();
+
+        Integer mpaCount = jdbcTemplate.queryForObject(
+                "SELECT COUNT(*) FROM mpa_ratings WHERE id = ?",
+                Integer.class,
+                mpaId
+        );
+
+        if (mpaCount == null || mpaCount == 0) {
+            throw new NotFoundException(
+                    "Рейтинг MPA с id=" + mpaId + " не найден"
+            );
+        }
+
+        if (film.getGenres() == null) {
+            return;
+        }
+
+        film.getGenres().stream()
+                .map(Genre::getId)
+                .distinct()
+                .forEach(genreId -> {
+                    Integer genreCount = jdbcTemplate.queryForObject(
+                            "SELECT COUNT(*) FROM genres WHERE id = ?",
+                            Integer.class,
+                            genreId
+                    );
+
+                    if (genreCount == null || genreCount == 0) {
+                        throw new NotFoundException(
+                                "Жанр с id=" + genreId + " не найден"
+                        );
+                    }
+                });
     }
 }
