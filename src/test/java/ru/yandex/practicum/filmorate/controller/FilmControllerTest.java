@@ -10,6 +10,7 @@ import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.ResultActions;
 import ru.yandex.practicum.filmorate.model.Film;
+import ru.yandex.practicum.filmorate.model.Mpa;
 import ru.yandex.practicum.filmorate.service.FilmService;
 import ru.yandex.practicum.filmorate.storage.film.FilmStorage;
 
@@ -29,7 +30,7 @@ class FilmControllerTest {
     @Autowired
     private ObjectMapper objectMapper;
 
-    @MockitoBean
+    @MockitoBean(name = "filmDbStorage")
     private FilmStorage filmStorage;
 
     @MockitoBean
@@ -49,6 +50,7 @@ class FilmControllerTest {
                 LocalDate.of(2014, 11, 6),
                 169
         );
+        film.setMpa(new Mpa(1, "G"));
     }
 
     @Test

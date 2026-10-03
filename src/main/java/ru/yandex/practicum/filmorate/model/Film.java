@@ -11,6 +11,7 @@ import ru.yandex.practicum.filmorate.validation.ValidReleaseDate;
 
 import java.time.LocalDate;
 import java.util.HashSet;
+import java.util.LinkedHashSet;
 import java.util.Set;
 
 @Data
@@ -33,6 +34,11 @@ public class Film {
     @Positive(message = "Продолжительность фильма должна быть положительной")
     private int duration;
 
+    @NotNull(message = "Необходимо указать рейтинг MPA")
+    private Mpa mpa;
+
+    private Set<Genre> genres = new LinkedHashSet<>();
+
     public Film(Long id,
                 String name,
                 String description,
@@ -44,5 +50,6 @@ public class Film {
         this.releaseDate = releaseDate;
         this.duration = duration;
         this.likes = new HashSet<>();
+        this.genres = new LinkedHashSet<>();
     }
 }

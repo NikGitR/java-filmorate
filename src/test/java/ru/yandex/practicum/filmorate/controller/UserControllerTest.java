@@ -31,7 +31,7 @@ class UserControllerTest {
     @Autowired
     private ObjectMapper objectMapper;
 
-    @MockitoBean
+    @MockitoBean(name = "userDbStorage")
     private UserStorage userStorage;
 
     @MockitoBean
