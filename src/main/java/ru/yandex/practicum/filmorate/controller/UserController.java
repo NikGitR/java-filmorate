@@ -1,52 +1,38 @@
 package ru.yandex.practicum.filmorate.controller;
 
 import jakarta.validation.Valid;
-import org.springframework.beans.factory.annotation.Qualifier;
-import lombok.extern.slf4j.Slf4j;
+import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.*;
 import ru.yandex.practicum.filmorate.model.User;
 import ru.yandex.practicum.filmorate.service.UserService;
-import ru.yandex.practicum.filmorate.storage.user.UserStorage;
-
 import java.util.*;
 
-@Slf4j
-@RestController
 
+@RestController
 @RequestMapping("/users")
+@RequiredArgsConstructor
 public class UserController {
 
-    private final UserStorage userStorage;
     private final UserService userService;
-
-    public UserController(
-            @Qualifier("userDbStorage") UserStorage userStorage,
-            UserService userService
-    ) {
-        this.userStorage = userStorage;
-        this.userService = userService;
-    }
 
     @PostMapping
     public User create(@Valid @RequestBody User user) {
-        prepareUser(user);
-        return userStorage.create(user);
+        return userService.create(user);
     }
 
     @PutMapping
     public User update(@Valid @RequestBody User user) {
-        prepareUser(user);
-        return userStorage.update(user);
+        return userService.update(user);
     }
 
     @GetMapping
     public Collection<User> getAll() {
-        return userStorage.getAll();
+        return userService.getAll();
     }
 
     @GetMapping("/{id}")
     public User getById(@PathVariable Long id) {
-        return userStorage.getById(id);
+        return userService.getById(id);
     }
 
     @PutMapping("/{id}/friends/{friendId}")
@@ -73,11 +59,4 @@ public class UserController {
     ) {
         return userService.getCommonFriends(id, otherId);
     }
-
-    private void prepareUser(User user) {
-        if (user.getName() == null || user.getName().isBlank()) {
-            user.setName(user.getLogin());
-        }
-    }
-
 }

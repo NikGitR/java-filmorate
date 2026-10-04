@@ -32,7 +32,7 @@ public class Film {
     private LocalDate releaseDate;
 
     @Positive(message = "Продолжительность фильма должна быть положительной")
-    private int duration;
+    private Integer duration;
 
     @NotNull(message = "Необходимо указать рейтинг MPA")
     private Mpa mpa;
@@ -43,7 +43,7 @@ public class Film {
                 String name,
                 String description,
                 LocalDate releaseDate,
-                int duration) {
+                Integer duration) {
         this.id = id;
         this.name = name;
         this.description = description;
