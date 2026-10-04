@@ -1,42 +1,40 @@
 package ru.yandex.practicum.filmorate.controller;
 
 import jakarta.validation.Valid;
+
 import lombok.RequiredArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
 import org.springframework.web.bind.annotation.*;
 import ru.yandex.practicum.filmorate.model.Film;
 import ru.yandex.practicum.filmorate.service.FilmService;
-import ru.yandex.practicum.filmorate.storage.film.FilmStorage;
+
 
 import java.util.*;
 
-@Slf4j
 @RestController
-@RequiredArgsConstructor
 @RequestMapping("/films")
+@RequiredArgsConstructor
 public class FilmController {
 
-    private final FilmStorage filmStorage;
     private final FilmService filmService;
 
     @PostMapping
     public Film create(@Valid @RequestBody Film film) {
-        return filmStorage.create(film);
+        return filmService.create(film);
     }
 
     @PutMapping
     public Film update(@Valid @RequestBody Film film) {
-        return filmStorage.update(film);
+        return filmService.update(film);
     }
 
     @GetMapping
     public Collection<Film> getAll() {
-        return filmStorage.getAll();
+        return filmService.getAll();
     }
 
     @GetMapping("/{id}")
     public Film getById(@PathVariable Long id) {
-        return filmStorage.getById(id);
+        return filmService.getById(id);
     }
 
     @PutMapping("/{id}/like/{userId}")

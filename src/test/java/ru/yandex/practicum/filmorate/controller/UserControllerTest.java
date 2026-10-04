@@ -12,6 +12,7 @@ import org.springframework.test.web.servlet.ResultActions;
 import ru.yandex.practicum.filmorate.model.User;
 import ru.yandex.practicum.filmorate.service.UserService;
 import ru.yandex.practicum.filmorate.storage.user.UserStorage;
+import org.springframework.context.annotation.Import;
 
 import java.time.LocalDate;
 
@@ -23,6 +24,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 @WebMvcTest(UserController.class)
+@Import(UserService.class)
 class UserControllerTest {
 
     @Autowired
@@ -31,11 +33,8 @@ class UserControllerTest {
     @Autowired
     private ObjectMapper objectMapper;
 
-    @MockitoBean
+    @MockitoBean(name = "userDbStorage")
     private UserStorage userStorage;
-
-    @MockitoBean
-    private UserService userService;
 
     private User user;
 
