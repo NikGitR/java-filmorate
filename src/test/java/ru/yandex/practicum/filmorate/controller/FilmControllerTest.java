@@ -12,7 +12,6 @@ import org.springframework.test.web.servlet.ResultActions;
 import ru.yandex.practicum.filmorate.model.Film;
 import ru.yandex.practicum.filmorate.model.Mpa;
 import ru.yandex.practicum.filmorate.service.FilmService;
-import ru.yandex.practicum.filmorate.storage.film.FilmStorage;
 
 import java.time.LocalDate;
 
@@ -30,9 +29,6 @@ class FilmControllerTest {
     @Autowired
     private ObjectMapper objectMapper;
 
-    @MockitoBean(name = "filmDbStorage")
-    private FilmStorage filmStorage;
-
     @MockitoBean
     private FilmService filmService;
 
@@ -40,9 +36,8 @@ class FilmControllerTest {
 
     @BeforeEach
     void setUp() {
-        when(filmStorage.create(any(Film.class)))
+        when(filmService.create(any(Film.class)))
                 .thenAnswer(invocation -> invocation.getArgument(0));
-
         film = new Film(
                 null,
                 "Интерстеллар",
